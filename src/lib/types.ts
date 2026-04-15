@@ -144,7 +144,7 @@ export const SAMPLE_PROJECTS: Project[] = [
   },
   {
     id: '4',
-    name: 'Nexus',
+    name: 'Synapse',
     description: 'Internal team communications & collaboration hub',
     long_description:
       'Nexus keeps your team aligned with real-time messaging, channels, file sharing, and task threads — all in one place. Cut through email noise and bring your internal communications into a focused, organized workspace built for productivity.',
@@ -160,7 +160,7 @@ export const SAMPLE_PROJECTS: Project[] = [
   },
   {
     id: '5',
-    name: 'LeadFlow',
+    name: 'Data Nest',
     description: 'Smart lead management & pipeline tracking CRM',
     long_description:
       'LeadFlow gives your sales team a clean, visual pipeline to capture, qualify, and close leads faster. Track every interaction, set follow-up reminders, assign leads to team members, and get real-time reporting on your entire sales funnel.',
