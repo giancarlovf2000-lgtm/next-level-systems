@@ -22,8 +22,13 @@ export interface Project {
 
 // Tools that can be merged into SiteForge
 export const SITEFORGE_ID = '3'
-export const MERGEABLE_IDS = ['4', '5', '6', '7']       // Synapse, Data Nest, OutreachIQ, Prospex
+export const MERGEABLE_IDS = ['4', '5', '6', '7']        // Synapse, Data Nest, OutreachIQ, Prospex
 export const STANDALONE_ONLY_IDS = ['1', '2']             // Brandify, AtlasVitae
+
+// SiteForge page-based pricing
+export const SITEFORGE_BASE_PRICE = 75                    // includes 3 pages
+export const SITEFORGE_INCLUDED_PAGES = 3
+export const SITEFORGE_EXTRA_PAGE_PRICE = 154             // per additional page
 
 export interface Subscription {
   id: string
@@ -145,7 +150,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     tags: ['Website', 'No-Code', 'Builder', 'SEO'],
     status: 'coming_soon',
     plan_required: 'pro',
-    price: 39,
+    price: 75,
     image_url: null,
     featured: false,
     sort_order: 3,
@@ -179,7 +184,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     tags: ['CRM', 'Leads', 'Pipeline', 'Sales'],
     status: 'coming_soon',
     plan_required: 'pro',
-    price: 35,
+    price: 254,
     image_url: null,
     featured: false,
     sort_order: 5,
@@ -196,7 +201,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     tags: ['Email', 'SMS', 'WhatsApp', 'Outreach', 'Clients'],
     status: 'coming_soon',
     plan_required: 'agency',
-    price: 45,
+    price: 178,
     image_url: null,
     featured: false,
     sort_order: 6,

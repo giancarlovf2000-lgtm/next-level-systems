@@ -8,7 +8,10 @@ import {
   MessageSquare, Target, Globe, Radio, Lock, ChevronRight,
   Zap, Users, Bot
 } from 'lucide-react'
-import { SAMPLE_PROJECTS, SITEFORGE_ID, MERGEABLE_IDS, STANDALONE_ONLY_IDS } from '@/lib/types'
+import {
+  SAMPLE_PROJECTS, SITEFORGE_ID, MERGEABLE_IDS, STANDALONE_ONLY_IDS,
+  SITEFORGE_BASE_PRICE, SITEFORGE_INCLUDED_PAGES, SITEFORGE_EXTRA_PAGE_PRICE,
+} from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 // ─── Merge integration details ───────────────────────────────────────────────
@@ -90,6 +93,7 @@ function CheckoutContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [deliveryMode, setDeliveryMode] = useState<'standalone' | 'merged' | null>(null)
+  const [extraPages, setExtraPages] = useState(0)
 
   const ids = searchParams.get('ids')?.split(',').filter(Boolean) ?? []
   const selected = SAMPLE_PROJECTS.filter((p) => ids.includes(p.id))
@@ -107,7 +111,14 @@ function CheckoutContent() {
     )
   }
 
-  const total = selected.reduce((sum, p) => sum + (p.price ?? 0), 0)
+  const siteForgeInCart = ids.includes(SITEFORGE_ID)
+  const siteForgeLineTotal = siteForgeInCart
+    ? SITEFORGE_BASE_PRICE + extraPages * SITEFORGE_EXTRA_PAGE_PRICE
+    : 0
+  const total = selected.reduce((sum, p) => {
+    if (p.id === SITEFORGE_ID) return sum + siteForgeLineTotal
+    return sum + (p.price ?? 0)
+  }, 0)
 
   // Merge eligibility
   const hasSiteForge = ids.includes(SITEFORGE_ID)
@@ -146,16 +157,51 @@ function CheckoutContent() {
           <div className="lg:col-span-1 space-y-4">
             <div className="rounded-2xl border border-border bg-surface p-5">
               <h2 className="text-sm font-semibold text-text-muted uppercase tracking-widest mb-4">Selected Tools</h2>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {selected.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between gap-2">
-                    <div>
-                      <div className="text-sm font-semibold text-text-primary">{p.name}</div>
-                      <div className="text-xs text-text-muted">{p.category}</div>
+                  <div key={p.id}>
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <div className="text-sm font-semibold text-text-primary">{p.name}</div>
+                        <div className="text-xs text-text-muted">{p.category}</div>
+                      </div>
+                      <div className="text-sm font-bold text-text-primary flex-shrink-0">
+                        {p.id === SITEFORGE_ID
+                          ? <>${siteForgeLineTotal}<span className="text-xs font-normal text-text-muted">/site</span></>
+                          : <>${p.price}<span className="text-xs font-normal text-text-muted">/mo</span></>
+                        }
+                      </div>
                     </div>
-                    <div className="text-sm font-bold text-text-primary flex-shrink-0">
-                      ${p.price}<span className="text-xs font-normal text-text-muted">/mo</span>
-                    </div>
+
+                    {/* SiteForge page stepper */}
+                    {p.id === SITEFORGE_ID && (
+                      <div className="mt-2 rounded-xl border border-border bg-surface-2 p-3 space-y-2">
+                        <div className="flex items-center justify-between text-xs text-text-muted">
+                          <span>Base: {SITEFORGE_INCLUDED_PAGES} pages included</span>
+                          <span className="text-text-primary font-semibold">${SITEFORGE_BASE_PRICE}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-xs text-text-muted">Extra pages (+${SITEFORGE_EXTRA_PAGE_PRICE}/page)</span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setExtraPages(Math.max(0, extraPages - 1))}
+                              className="w-7 h-7 rounded-lg border border-border bg-surface flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-primary/40 transition-all text-lg leading-none"
+                            >−</button>
+                            <span className="w-6 text-center text-sm font-bold text-text-primary">{extraPages}</span>
+                            <button
+                              onClick={() => setExtraPages(extraPages + 1)}
+                              className="w-7 h-7 rounded-lg border border-border bg-surface flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-primary/40 transition-all text-lg leading-none"
+                            >+</button>
+                          </div>
+                        </div>
+                        {extraPages > 0 && (
+                          <div className="flex items-center justify-between text-xs border-t border-border pt-2">
+                            <span className="text-text-muted">{SITEFORGE_INCLUDED_PAGES + extraPages} total pages</span>
+                            <span className="text-text-primary font-semibold">${siteForgeLineTotal}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

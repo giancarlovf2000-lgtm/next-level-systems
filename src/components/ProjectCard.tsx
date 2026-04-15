@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Lock, Zap, Bot, Workflow, Globe, Radio, Users, CheckCircle2, MessageSquare, Target, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Project } from '@/lib/types'
+import { SITEFORGE_ID, SITEFORGE_INCLUDED_PAGES, SITEFORGE_EXTRA_PAGE_PRICE } from '@/lib/types'
 
 const categoryConfig = {
   AI: {
@@ -179,14 +180,25 @@ export function ProjectCard({ project, userPlan = '', isSelected = false, onTogg
         </div>
 
         {/* Name + price */}
-        <div className="flex items-baseline justify-between mb-1">
+        <div className="flex items-start justify-between mb-1 gap-2">
           <h3 className="text-lg font-semibold text-text-primary group-hover:text-white transition-colors">
             {project.name}
           </h3>
           {project.price !== null && (
-            <span className={cn('text-sm font-bold', catConfig.iconColor)}>
-              ${project.price}<span className="text-xs font-normal text-text-muted">/mo</span>
-            </span>
+            project.id === SITEFORGE_ID ? (
+              <div className="text-right flex-shrink-0">
+                <span className={cn('text-sm font-bold', catConfig.iconColor)}>
+                  ${project.price}<span className="text-xs font-normal text-text-muted">/site</span>
+                </span>
+                <div className="text-xs text-text-muted whitespace-nowrap">
+                  {SITEFORGE_INCLUDED_PAGES} pages · +${SITEFORGE_EXTRA_PAGE_PRICE}/extra
+                </div>
+              </div>
+            ) : (
+              <span className={cn('text-sm font-bold flex-shrink-0', catConfig.iconColor)}>
+                ${project.price}<span className="text-xs font-normal text-text-muted">/mo</span>
+              </span>
+            )
           )}
         </div>
 
