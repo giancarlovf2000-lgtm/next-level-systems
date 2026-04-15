@@ -6,7 +6,7 @@ import { ProjectCard } from '@/components/ProjectCard'
 import { SAMPLE_PROJECTS } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
-const CATEGORIES = ['All', 'Web App', 'API', 'Automation', 'AI']
+const CATEGORIES = ['All', 'AI', 'HR & Payroll', 'Web App', 'Communications', 'CRM & Sales', 'Automation', 'API']
 const STATUSES = ['All', 'Live', 'Beta', 'Coming Soon']
 const PLANS = ['All', 'Free', 'Pro', 'Agency']
 

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Lock, Zap, Bot, Workflow, Globe, Radio, Users, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Lock, Zap, Bot, Workflow, Globe, Radio, Users, CheckCircle2, ArrowRight, MessageSquare, Target } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Project } from '@/lib/types'
 
@@ -50,6 +50,24 @@ const categoryConfig = {
     glow: 'hover:shadow-[0_20px_40px_-10px_rgba(244,63,94,0.3)]',
     iconBg: 'bg-rose-500/20',
     iconColor: 'text-rose-400',
+  },
+  Communications: {
+    icon: MessageSquare,
+    gradient: 'from-teal-500/20 to-cyan-600/10',
+    accent: 'text-teal-400',
+    border: 'border-teal-500/20',
+    glow: 'hover:shadow-[0_20px_40px_-10px_rgba(20,184,166,0.3)]',
+    iconBg: 'bg-teal-500/20',
+    iconColor: 'text-teal-400',
+  },
+  'CRM & Sales': {
+    icon: Target,
+    gradient: 'from-orange-500/20 to-amber-600/10',
+    accent: 'text-orange-400',
+    border: 'border-orange-500/20',
+    glow: 'hover:shadow-[0_20px_40px_-10px_rgba(249,115,22,0.3)]',
+    iconBg: 'bg-orange-500/20',
+    iconColor: 'text-orange-400',
   },
 }
 

@@ -8,7 +8,7 @@ import { SAMPLE_PROJECTS, PRICING_TIERS } from '@/lib/types'
 const featuredProjects = SAMPLE_PROJECTS.filter((p) => p.featured)
 
 const stats = [
-  { label: 'Apps Available', value: '2', icon: Zap, color: 'text-primary' },
+  { label: 'Apps Available', value: '7', icon: Zap, color: 'text-primary' },
   { label: 'Active Clients', value: '50+', icon: Users, color: 'text-cyan' },
   { label: 'Uptime', value: '99.9%', icon: TrendingUp, color: 'text-success' },
   { label: 'Countries Served', value: '5+', icon: Globe, color: 'text-accent' },
@@ -72,7 +72,7 @@ export default function HomePage() {
               <span className="gradient-text">power your business</span>
             </h2>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              Two focused platforms — AI content creation and HR management.
+              Seven focused tools — from AI content creation to payroll, CRM, and outreach.
               Subscribe once, get access, and grow with confidence.
             </p>
           </div>

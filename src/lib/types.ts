@@ -1,4 +1,4 @@
-export type ProjectCategory = 'Web App' | 'API' | 'Automation' | 'AI' | 'HR & Payroll'
+export type ProjectCategory = 'Web App' | 'API' | 'Automation' | 'AI' | 'HR & Payroll' | 'Communications' | 'CRM & Sales'
 export type ProjectStatus = 'live' | 'beta' | 'coming_soon'
 export type PlanType = 'free' | 'pro' | 'agency'
 export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing'
@@ -124,6 +124,86 @@ export const SAMPLE_PROJECTS: Project[] = [
     image_url: null,
     featured: true,
     sort_order: 2,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '3',
+    name: 'SiteForge',
+    description: 'Drag-and-drop website builder for modern businesses',
+    long_description:
+      'SiteForge lets you build stunning, fully responsive websites without writing a single line of code. Choose from professional templates, customize every detail, and publish to a custom domain in minutes. SEO-ready, fast, and built for conversion.',
+    url: null,
+    category: 'Web App',
+    tags: ['Website', 'No-Code', 'Builder', 'SEO'],
+    status: 'coming_soon',
+    plan_required: 'pro',
+    image_url: null,
+    featured: false,
+    sort_order: 3,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '4',
+    name: 'Nexus',
+    description: 'Internal team communications & collaboration hub',
+    long_description:
+      'Nexus keeps your team aligned with real-time messaging, channels, file sharing, and task threads — all in one place. Cut through email noise and bring your internal communications into a focused, organized workspace built for productivity.',
+    url: null,
+    category: 'Communications',
+    tags: ['Team Chat', 'Collaboration', 'Internal', 'Messaging'],
+    status: 'coming_soon',
+    plan_required: 'pro',
+    image_url: null,
+    featured: false,
+    sort_order: 4,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '5',
+    name: 'LeadFlow',
+    description: 'Smart lead management & pipeline tracking CRM',
+    long_description:
+      'LeadFlow gives your sales team a clean, visual pipeline to capture, qualify, and close leads faster. Track every interaction, set follow-up reminders, assign leads to team members, and get real-time reporting on your entire sales funnel.',
+    url: null,
+    category: 'CRM & Sales',
+    tags: ['CRM', 'Leads', 'Pipeline', 'Sales'],
+    status: 'coming_soon',
+    plan_required: 'pro',
+    image_url: null,
+    featured: false,
+    sort_order: 5,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '6',
+    name: 'OutreachIQ',
+    description: 'Multi-channel external communications for your clients',
+    long_description:
+      'OutreachIQ centralizes all your client-facing communication — email campaigns, SMS, WhatsApp, and more — in one unified platform. Schedule messages, track open rates, automate follow-ups, and keep every client conversation organized.',
+    url: null,
+    category: 'Communications',
+    tags: ['Email', 'SMS', 'WhatsApp', 'Outreach', 'Clients'],
+    status: 'coming_soon',
+    plan_required: 'agency',
+    image_url: null,
+    featured: false,
+    sort_order: 6,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: '7',
+    name: 'Prospex',
+    description: 'Find verified prospect emails from your competitors\' audiences',
+    long_description:
+      'Prospex lets you discover and verify contact information for potential clients who are already engaging with your competitors. Enter a competitor domain, filter by role or industry, and export a clean list of verified emails — ready to add to your outreach pipeline.',
+    url: null,
+    category: 'CRM & Sales',
+    tags: ['Prospecting', 'Email Finder', 'Lead Gen', 'Competitors', 'Sales'],
+    status: 'coming_soon',
+    plan_required: 'agency',
+    image_url: null,
+    featured: false,
+    sort_order: 7,
     created_at: new Date().toISOString(),
   },
 ]
