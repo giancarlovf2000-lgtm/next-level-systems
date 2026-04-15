@@ -8,29 +8,29 @@ import { SAMPLE_PROJECTS, PRICING_TIERS } from '@/lib/types'
 const featuredProjects = SAMPLE_PROJECTS.filter((p) => p.featured)
 
 const stats = [
-  { label: 'Developer Tools', value: '6+', icon: Zap, color: 'text-primary' },
-  { label: 'Active Clients', value: '500+', icon: Users, color: 'text-cyan' },
+  { label: 'Apps Available', value: '2', icon: Zap, color: 'text-primary' },
+  { label: 'Active Clients', value: '50+', icon: Users, color: 'text-cyan' },
   { label: 'Uptime', value: '99.9%', icon: TrendingUp, color: 'text-success' },
-  { label: 'Countries', value: '40+', icon: Globe, color: 'text-accent' },
+  { label: 'Countries Served', value: '5+', icon: Globe, color: 'text-accent' },
 ]
 
 const testimonials = [
   {
-    quote: "Next Level Systems transformed our workflow. The AI tools alone saved us 20+ hours a week.",
-    author: "Sarah Chen",
-    role: "CTO, TechVentures",
+    quote: "Brandify completely changed how we create content. Our social media output tripled in the first month.",
+    author: "Maria G.",
+    role: "Brand Manager",
     rating: 5,
   },
   {
-    quote: "The analytics dashboard is incredibly powerful. We finally have real visibility into our business.",
-    author: "Marcus Johnson",
-    role: "Head of Growth, ScaleUp",
+    quote: "AtlasVitae simplified our payroll process. What used to take days now takes minutes.",
+    author: "Carlos R.",
+    role: "HR Director",
     rating: 5,
   },
   {
-    quote: "Best investment we made this year. The automation hub replaced three separate tools for us.",
-    author: "Elena Rodriguez",
-    role: "Operations Director, Nexara",
+    quote: "Having everything under one platform makes billing and access management so much easier.",
+    author: "Sofia M.",
+    role: "Operations Lead",
     rating: 5,
   },
 ]
@@ -67,17 +67,17 @@ export default function HomePage() {
               Featured Tools
             </div>
             <h2 className="text-4xl sm:text-5xl font-black text-text-primary mb-4">
-              Everything you need to
+              Professional tools built to
               <br />
-              <span className="gradient-text">scale your business</span>
+              <span className="gradient-text">power your business</span>
             </h2>
             <p className="text-lg text-text-secondary max-w-2xl mx-auto">
-              A curated suite of professional tools built for modern teams.
-              No bloat, no complexity — just powerful, focused software.
+              Two focused platforms — AI content creation and HR management.
+              Subscribe once, get access, and grow with confidence.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-3xl mx-auto">
             {featuredProjects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
@@ -88,7 +88,7 @@ export default function HomePage() {
               href="/projects"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl btn-ghost text-text-primary font-medium group"
             >
-              View all {SAMPLE_PROJECTS.length} tools
+              See full app details
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -181,7 +181,7 @@ export default function HomePage() {
             <span className="gradient-text">next level?</span>
           </h2>
           <p className="text-lg text-text-secondary mb-8 max-w-xl mx-auto">
-            Join 500+ teams already using Next Level Systems to build, automate, and scale.
+            Subscribe to Brandify or AtlasVitae and we&apos;ll get you set up within 24 hours.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link

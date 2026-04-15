@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ExternalLink, Lock, Zap, Bot, BarChart3, Workflow, Globe, Radio } from 'lucide-react'
+import { Lock, Zap, Bot, Workflow, Globe, Radio, Users, CheckCircle2, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Project } from '@/lib/types'
 
@@ -41,6 +41,15 @@ const categoryConfig = {
     glow: 'hover:shadow-[0_20px_40px_-10px_rgba(16,185,129,0.3)]',
     iconBg: 'bg-emerald-500/20',
     iconColor: 'text-emerald-400',
+  },
+  'HR & Payroll': {
+    icon: Users,
+    gradient: 'from-rose-500/20 to-pink-600/10',
+    accent: 'text-rose-400',
+    border: 'border-rose-500/20',
+    glow: 'hover:shadow-[0_20px_40px_-10px_rgba(244,63,94,0.3)]',
+    iconBg: 'bg-rose-500/20',
+    iconColor: 'text-rose-400',
   },
 }
 
@@ -169,31 +178,29 @@ export function ProjectCard({ project, userPlan = '' }: ProjectCardProps) {
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-surface-2 text-text-muted border border-border cursor-not-allowed"
           >
             <Radio className="w-4 h-4" />
-            Notify Me When Live
+            Coming Soon
           </button>
-        ) : hasAccess || project.plan_required === 'free' ? (
-          <a
-            href={project.url || '#'}
-            target="_blank"
-            rel="noopener noreferrer"
+        ) : hasAccess ? (
+          <div
             className={cn(
-              'w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
-              'bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-white hover:border-primary hover:shadow-glow-sm'
+              'w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium',
+              'bg-success/10 text-success border border-success/30'
             )}
           >
-            <ExternalLink className="w-4 h-4" />
-            Open App
-          </a>
+            <CheckCircle2 className="w-4 h-4" />
+            Access Active — Check your email
+          </div>
         ) : (
           <Link
             href="/pricing"
             className={cn(
               'w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
-              'bg-surface-2 text-text-secondary border border-border hover:border-primary/40 hover:text-primary'
+              'bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-white hover:border-primary hover:shadow-glow-sm'
             )}
           >
             <Lock className="w-4 h-4" />
-            Upgrade to {plnConfig.label}
+            Get Access
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         )}
       </div>
