@@ -224,4 +224,21 @@ export const SAMPLE_PROJECTS: Project[] = [
     sort_order: 7,
     created_at: new Date().toISOString(),
   },
+  {
+    id: '8',
+    name: 'Observe',
+    description: 'Global situational awareness dashboard',
+    long_description:
+      'OBSERVE is a global situational awareness dashboard. It aggregates publicly available data — weather events, market prices, flight tracking, conflict reports, and news — into a single command center. Connect your own free API keys to unlock additional layers.',
+    url: null,
+    category: 'Intelligence',
+    tags: ['Dashboard', 'Weather', 'Markets', 'News', 'Awareness'],
+    status: 'coming_soon',
+    plan_required: 'pro',
+    price: 29,
+    image_url: null,
+    featured: false,
+    sort_order: 8,
+    created_at: new Date().toISOString(),
+  },
 ]
