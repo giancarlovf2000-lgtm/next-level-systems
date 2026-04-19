@@ -275,4 +275,21 @@ export const SAMPLE_PROJECTS: Project[] = [
     sort_order: 10,
     created_at: new Date().toISOString(),
   },
+  {
+    id: '11',
+    name: 'stratos-ai',
+    description: 'AI-powered client reporting & presentation platform',
+    long_description:
+      'Stratos AI is an AI-powered client reporting and presentation platform for marketing/admissions agencies.',
+    url: null,
+    category: 'AI',
+    tags: ['AI', 'Reporting', 'Presentations', 'Marketing', 'Agencies'],
+    status: 'coming_soon',
+    plan_required: 'pro',
+    price: 15,
+    image_url: null,
+    featured: false,
+    sort_order: 11,
+    created_at: new Date().toISOString(),
+  },
 ]
