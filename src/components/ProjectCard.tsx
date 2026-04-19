@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Lock, Zap, Bot, Workflow, Globe, Radio, Users, CheckCircle2, MessageSquare, Target, Check, Eye } from 'lucide-react'
+import { Lock, Zap, Bot, Workflow, Globe, Radio, Users, CheckCircle2, MessageSquare, Target, Check, Eye, UtensilsCrossed } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Project } from '@/lib/types'
 import { SITEFORGE_ID, SITEFORGE_INCLUDED_PAGES, SITEFORGE_EXTRA_PAGE_PRICE } from '@/lib/types'
@@ -94,6 +94,17 @@ const categoryConfig = {
     iconBg: 'bg-sky-500/20',
     iconColor: 'text-sky-400',
     checkBg: 'bg-sky-500',
+  },
+  Hospitality: {
+    icon: UtensilsCrossed,
+    gradient: 'from-amber-500/20 to-yellow-600/10',
+    border: 'border-amber-500/20',
+    selectedBorder: 'border-amber-400',
+    glow: 'hover:shadow-[0_20px_40px_-10px_rgba(245,158,11,0.3)]',
+    selectedGlow: 'shadow-[0_20px_40px_-10px_rgba(245,158,11,0.4)]',
+    iconBg: 'bg-amber-500/20',
+    iconColor: 'text-amber-400',
+    checkBg: 'bg-amber-500',
   },
 }
 

@@ -241,4 +241,21 @@ export const SAMPLE_PROJECTS: Project[] = [
     sort_order: 8,
     created_at: new Date().toISOString(),
   },
+  {
+    id: '9',
+    name: 'Tavolo',
+    description: 'The digital menu your restaurant deserves',
+    long_description:
+      'Let customers order directly from their table by scanning a QR code. Kitchen and bar get notified instantly. No apps. No friction.',
+    url: null,
+    category: 'Hospitality',
+    tags: ['Restaurant', 'QR Code', 'Menu', 'Orders', 'Kitchen'],
+    status: 'coming_soon',
+    plan_required: 'pro',
+    price: 49,
+    image_url: null,
+    featured: false,
+    sort_order: 9,
+    created_at: new Date().toISOString(),
+  },
 ]
