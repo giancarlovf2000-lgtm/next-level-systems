@@ -258,4 +258,21 @@ export const SAMPLE_PROJECTS: Project[] = [
     sort_order: 9,
     created_at: new Date().toISOString(),
   },
+  {
+    id: '10',
+    name: 'stratos.builders',
+    description: 'Build software projects at the speed of thought',
+    long_description:
+      'Build software projects at the speed of thought. AI-powered planning, real-time collaboration, and one-click provisioning — all in one command center.',
+    url: null,
+    category: 'AI',
+    tags: ['AI', 'Dev Tools', 'Collaboration', 'Provisioning'],
+    status: 'coming_soon',
+    plan_required: 'pro',
+    price: 19,
+    image_url: null,
+    featured: false,
+    sort_order: 10,
+    created_at: new Date().toISOString(),
+  },
 ]
