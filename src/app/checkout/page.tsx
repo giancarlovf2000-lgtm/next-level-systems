@@ -140,13 +140,18 @@ function CheckoutContent() {
       return
     }
 
-    const requiresAgency = selected.some((p) => p.plan_required === 'agency')
-    const plan = requiresAgency ? 'agency' : 'pro'
+    const purchasableIds = selected.filter((p) => p.stripe_price_id).map((p) => p.id)
+
+    if (purchasableIds.length === 0) {
+      setCheckoutError('None of the selected tools are available for purchase yet.')
+      setCheckoutLoading(false)
+      return
+    }
 
     const res = await fetch('/api/stripe/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan, userId: user.id, userEmail: user.email }),
+      body: JSON.stringify({ toolIds: purchasableIds, userId: user.id, userEmail: user.email }),
     })
 
     const data = await res.json()

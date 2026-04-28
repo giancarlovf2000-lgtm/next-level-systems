@@ -2,25 +2,13 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import {
   ExternalLink,
-  CreditCard,
   Settings,
   Zap,
   ArrowRight,
-  Calendar,
-  CheckCircle2,
-  AlertCircle,
-  Crown,
   BarChart3,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { SAMPLE_PROJECTS, PRICING_TIERS } from '@/lib/types'
-
-function planCanAccess(userPlan: string, requiredPlan: string): boolean {
-  const planOrder = { free: 0, pro: 1, agency: 2 }
-  const userLevel = planOrder[userPlan as keyof typeof planOrder] ?? 0
-  const requiredLevel = planOrder[requiredPlan as keyof typeof planOrder] ?? 0
-  return userLevel >= requiredLevel
-}
+import { SAMPLE_PROJECTS } from '@/lib/types'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -33,36 +21,21 @@ export default async function DashboardPage() {
     redirect('/auth/login')
   }
 
-  // Try to fetch subscription from DB, fallback to free
-  let subscription = null
+  // Fetch purchased tools
+  let purchasedToolIds: string[] = []
   try {
     const { data } = await supabase
-      .from('subscriptions')
-      .select('*')
+      .from('user_tools')
+      .select('tool_id')
       .eq('user_id', user.id)
-      .single()
-    subscription = data
+      .eq('status', 'active')
+    purchasedToolIds = (data ?? []).map((r: { tool_id: string }) => r.tool_id)
   } catch {
-    // Table might not exist yet, that's okay
+    // Table might not exist yet
   }
 
-  const userPlan = subscription?.plan || 'free'
-  const currentTier = PRICING_TIERS.find((t) => t.id === userPlan) || PRICING_TIERS[0]
-  const accessibleProjects = SAMPLE_PROJECTS.filter((p) =>
-    planCanAccess(userPlan, p.plan_required)
-  )
-
-  const planColors = {
-    free: 'text-text-secondary',
-    pro: 'text-primary',
-    agency: 'text-accent',
-  }
-
-  const planBg = {
-    free: 'bg-surface-2 border-border',
-    pro: 'bg-primary/10 border-primary/30',
-    agency: 'bg-accent/10 border-accent/30',
-  }
+  const purchasedTools = SAMPLE_PROJECTS.filter((p) => purchasedToolIds.includes(p.id))
+  const notPurchasedTools = SAMPLE_PROJECTS.filter((p) => !purchasedToolIds.includes(p.id))
 
   return (
     <div className="min-h-screen pt-24 pb-16">
@@ -83,89 +56,32 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Subscription card */}
-            <div
-              className={`rounded-2xl border p-6 ${planBg[userPlan as keyof typeof planBg] || planBg.free}`}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Crown
-                      className={`w-5 h-5 ${planColors[userPlan as keyof typeof planColors]}`}
-                    />
-                    <h2 className="text-lg font-bold text-text-primary">
-                      {currentTier.name} Plan
-                    </h2>
-                  </div>
-                  <p className="text-sm text-text-secondary">{currentTier.description}</p>
-                </div>
-                <div className="text-right">
-                  <div
-                    className={`text-2xl font-black ${planColors[userPlan as keyof typeof planColors]}`}
-                  >
-                    {currentTier.price === 0 ? 'Free' : `$${currentTier.price}/mo`}
-                  </div>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-3 flex-wrap">
-                {userPlan === 'free' ? (
-                  <Link
-                    href="/pricing"
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg btn-primary text-sm font-semibold text-white"
-                  >
-                    <Zap className="w-3.5 h-3.5" />
-                    Upgrade to Pro
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                ) : (
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-2 border border-border text-sm font-medium text-text-secondary hover:text-text-primary hover:border-border-light transition-all">
-                    <CreditCard className="w-3.5 h-3.5" />
-                    Manage Billing
-                  </button>
-                )}
-
-                {subscription?.current_period_end && (
-                  <div className="flex items-center gap-1.5 text-xs text-text-muted">
-                    <Calendar className="w-3.5 h-3.5" />
-                    Renews {new Date(subscription.current_period_end).toLocaleDateString()}
-                  </div>
-                )}
-
-                <div
-                  className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
-                    subscription?.status === 'active' || !subscription
-                      ? 'bg-success/10 text-success'
-                      : 'bg-warning/10 text-warning'
-                  }`}
-                >
-                  {subscription?.status === 'active' || !subscription ? (
-                    <CheckCircle2 className="w-3 h-3" />
-                  ) : (
-                    <AlertCircle className="w-3 h-3" />
-                  )}
-                  {subscription?.status || 'Active'}
-                </div>
-              </div>
-            </div>
-
-            {/* Accessible tools */}
+            {/* Your Tools */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-text-primary">Your Tools</h2>
-                <span className="text-sm text-text-muted">
-                  {accessibleProjects.filter((p) => p.status !== 'coming_soon').length} accessible
-                </span>
+                <span className="text-sm text-text-muted">{purchasedTools.length} active</span>
               </div>
 
-              {/* Tools user has access to */}
-              <div className="space-y-3 mb-8">
-                {SAMPLE_PROJECTS.filter((p) => planCanAccess(userPlan, p.plan_required)).map((project) => {
-                  const hasAccess = project.status !== 'coming_soon'
-                  return (
+              {purchasedTools.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-border bg-surface/50 p-10 text-center">
+                  <Zap className="w-8 h-8 text-text-muted mx-auto mb-3" />
+                  <p className="text-sm font-semibold text-text-primary mb-1">No tools yet</p>
+                  <p className="text-xs text-text-muted mb-4">Browse our tools and subscribe to the ones you need.</p>
+                  <Link
+                    href="/projects"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg btn-primary text-sm font-semibold text-white"
+                  >
+                    Browse Tools <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {purchasedTools.map((project) => (
                     <div
                       key={project.id}
-                      className="bg-surface border border-border hover:border-primary/40 hover:bg-surface-2 rounded-xl border transition-all duration-200 p-4"
+                      className="bg-surface border border-border hover:border-primary/40 hover:bg-surface-2 rounded-xl transition-all duration-200 p-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -174,18 +90,12 @@ export default async function DashboardPage() {
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-sm font-semibold text-text-primary">
-                                {project.name}
-                              </span>
-                              <span
-                                className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                                  project.status === 'live'
-                                    ? 'bg-success/10 text-success'
-                                    : project.status === 'beta'
-                                    ? 'bg-warning/10 text-warning'
-                                    : 'bg-surface-2 text-text-muted'
-                                }`}
-                              >
+                              <span className="text-sm font-semibold text-text-primary">{project.name}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                                project.status === 'live' ? 'bg-success/10 text-success'
+                                : project.status === 'beta' ? 'bg-warning/10 text-warning'
+                                : 'bg-surface-2 text-text-muted'
+                              }`}>
                                 {project.status === 'coming_soon' ? 'Soon' : project.status}
                               </span>
                             </div>
@@ -195,7 +105,7 @@ export default async function DashboardPage() {
                           </div>
                         </div>
                         <div className="flex-shrink-0">
-                          {hasAccess ? (
+                          {project.status !== 'coming_soon' ? (
                             <a
                               href={project.url || '#'}
                               target="_blank"
@@ -211,45 +121,45 @@ export default async function DashboardPage() {
                         </div>
                       </div>
                     </div>
-                  )
-                })}
-              </div>
-
-              {/* Locked tools */}
-              {SAMPLE_PROJECTS.some((p) => !planCanAccess(userPlan, p.plan_required)) && (
-                <>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex-1 h-px bg-border" />
-                    <span className="text-xs text-text-muted uppercase tracking-widest">Upgrade to unlock</span>
-                    <div className="flex-1 h-px bg-border" />
-                  </div>
-                  <div className="space-y-3 opacity-60">
-                    {SAMPLE_PROJECTS.filter((p) => !planCanAccess(userPlan, p.plan_required)).map((project) => (
-                      <div
-                        key={project.id}
-                        className="flex items-center justify-between p-4 rounded-xl border border-border bg-surface/50"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold bg-surface-2 text-text-muted">
-                            {project.name.slice(0, 2).toUpperCase()}
-                          </div>
-                          <div>
-                            <span className="text-sm font-semibold text-text-primary">{project.name}</span>
-                            <p className="text-xs text-text-muted">{project.description}</p>
-                          </div>
-                        </div>
-                        <Link
-                          href="/pricing"
-                          className="text-xs px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-200"
-                        >
-                          Upgrade
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                </>
+                  ))}
+                </div>
               )}
             </div>
+
+            {/* Other available tools */}
+            {notPurchasedTools.length > 0 && (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-1 h-px bg-border" />
+                  <span className="text-xs text-text-muted uppercase tracking-widest">More tools</span>
+                  <div className="flex-1 h-px bg-border" />
+                </div>
+                <div className="space-y-3 opacity-70">
+                  {notPurchasedTools.map((project) => (
+                    <div
+                      key={project.id}
+                      className="flex items-center justify-between p-4 rounded-xl border border-border bg-surface/50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold bg-surface-2 text-text-muted">
+                          {project.name.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <span className="text-sm font-semibold text-text-primary">{project.name}</span>
+                          <p className="text-xs text-text-muted">{project.description}</p>
+                        </div>
+                      </div>
+                      <Link
+                        href="/projects"
+                        className="text-xs px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-200"
+                      >
+                        Add
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -266,13 +176,7 @@ export default async function DashboardPage() {
                   <p className="text-sm text-text-primary mt-0.5 truncate">{user.email}</p>
                 </div>
                 <div>
-                  <label className="text-xs text-text-muted uppercase tracking-widest">User ID</label>
-                  <p className="text-xs text-text-muted font-mono mt-0.5 truncate">{user.id}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-text-muted uppercase tracking-widest">
-                    Joined
-                  </label>
+                  <label className="text-xs text-text-muted uppercase tracking-widest">Joined</label>
                   <p className="text-sm text-text-primary mt-0.5">
                     {new Date(user.created_at || Date.now()).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -292,56 +196,35 @@ export default async function DashboardPage() {
               </h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-text-secondary">Tools accessible</span>
-                  <span className="text-sm font-bold text-primary">
-                    {accessibleProjects.filter((p) => p.status !== 'coming_soon').length}/
-                    {SAMPLE_PROJECTS.filter((p) => p.status !== 'coming_soon').length}
-                  </span>
-                </div>
-                <div className="w-full bg-surface-2 rounded-full h-1.5">
-                  <div
-                    className="bg-primary h-1.5 rounded-full transition-all duration-700"
-                    style={{
-                      width: `${
-                        (accessibleProjects.filter((p) => p.status !== 'coming_soon').length /
-                          SAMPLE_PROJECTS.filter((p) => p.status !== 'coming_soon').length) *
-                        100
-                      }%`,
-                    }}
-                  />
+                  <span className="text-sm text-text-secondary">Tools owned</span>
+                  <span className="text-sm font-bold text-primary">{purchasedTools.length}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-text-secondary">Current plan</span>
-                  <span
-                    className={`text-sm font-bold capitalize ${
-                      planColors[userPlan as keyof typeof planColors]
-                    }`}
-                  >
-                    {userPlan}
+                  <span className="text-sm text-text-secondary">Monthly total</span>
+                  <span className="text-sm font-bold text-primary">
+                    ${purchasedTools.reduce((sum, p) => sum + (p.price ?? 0), 0)}/mo
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Upgrade CTA */}
-            {userPlan === 'free' && (
-              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Zap className="w-4 h-4 text-primary" fill="currentColor" />
-                  <span className="text-sm font-bold text-primary">Unlock more tools</span>
-                </div>
-                <p className="text-xs text-text-secondary mb-4 leading-relaxed">
-                  Upgrade to Pro to access the AI Content Generator, Analytics Dashboard, and more.
-                </p>
-                <Link
-                  href="/pricing"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg btn-primary text-sm font-semibold text-white"
-                >
-                  Upgrade to Pro — $29/mo
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+            {/* Browse CTA */}
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="w-4 h-4 text-primary" fill="currentColor" />
+                <span className="text-sm font-bold text-primary">Add more tools</span>
               </div>
-            )}
+              <p className="text-xs text-text-secondary mb-4 leading-relaxed">
+                Browse all available tools and subscribe to the ones that fit your workflow.
+              </p>
+              <Link
+                href="/projects"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg btn-primary text-sm font-semibold text-white"
+              >
+                Browse Tools
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </div>
         </div>
       </div>

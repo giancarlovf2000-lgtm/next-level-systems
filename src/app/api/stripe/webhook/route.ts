@@ -3,17 +3,10 @@ import { stripe } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
-// Use service role for webhook (bypasses RLS)
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
-
-function getPlanFromPriceId(priceId: string): string {
-  if (priceId === process.env.STRIPE_PRO_PRICE_ID) return 'pro'
-  if (priceId === process.env.STRIPE_AGENCY_PRICE_ID) return 'agency'
-  return 'free'
-}
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -26,11 +19,7 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    )
+    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
   } catch (err) {
     console.error('Webhook signature verification failed:', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
@@ -41,25 +30,23 @@ export async function POST(req: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.metadata?.userId
+        const toolIds = session.metadata?.toolIds?.split(',').filter(Boolean) ?? []
         const subscriptionId = session.subscription as string
 
-        if (!userId || !subscriptionId) break
+        if (!userId || !subscriptionId || toolIds.length === 0) break
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-        const priceId = subscription.items.data[0]?.price.id
-        const plan = getPlanFromPriceId(priceId)
 
-        await supabaseAdmin.from('subscriptions').upsert({
+        const rows = toolIds.map((toolId) => ({
           user_id: userId,
-          stripe_customer_id: session.customer as string,
+          tool_id: toolId,
           stripe_subscription_id: subscriptionId,
-          plan,
+          stripe_customer_id: session.customer as string,
           status: subscription.status,
           current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-        }, {
-          onConflict: 'user_id',
-        })
+        }))
 
+        await supabaseAdmin.from('user_tools').upsert(rows, { onConflict: 'user_id,tool_id' })
         break
       }
 
@@ -69,36 +56,24 @@ export async function POST(req: NextRequest) {
 
         if (!userId) break
 
-        const priceId = subscription.items.data[0]?.price.id
-        const plan = getPlanFromPriceId(priceId)
-
-        await supabaseAdmin.from('subscriptions').upsert({
-          user_id: userId,
-          stripe_subscription_id: subscription.id,
-          plan,
-          status: subscription.status,
-          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-        }, {
-          onConflict: 'user_id',
-        })
+        await supabaseAdmin
+          .from('user_tools')
+          .update({
+            status: subscription.status,
+            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          })
+          .eq('stripe_subscription_id', subscription.id)
 
         break
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
-        const userId = subscription.metadata?.userId
-
-        if (!userId) break
 
         await supabaseAdmin
-          .from('subscriptions')
-          .update({
-            plan: 'free',
-            status: 'canceled',
-            stripe_subscription_id: null,
-          })
-          .eq('user_id', userId)
+          .from('user_tools')
+          .update({ status: 'canceled' })
+          .eq('stripe_subscription_id', subscription.id)
 
         break
       }
@@ -106,18 +81,12 @@ export async function POST(req: NextRequest) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
         const subscriptionId = invoice.subscription as string
-
         if (!subscriptionId) break
 
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-        const userId = subscription.metadata?.userId
-
-        if (!userId) break
-
         await supabaseAdmin
-          .from('subscriptions')
+          .from('user_tools')
           .update({ status: 'past_due' })
-          .eq('user_id', userId)
+          .eq('stripe_subscription_id', subscriptionId)
 
         break
       }

@@ -13,10 +13,22 @@ export interface Project {
   tags: string[]
   status: ProjectStatus
   plan_required: PlanType
-  price: number | null          // monthly price in USD
+  price: number | null
+  stripe_price_id: string | null
   image_url: string | null
   featured: boolean
   sort_order: number
+  created_at: string
+}
+
+export interface UserTool {
+  id: string
+  user_id: string
+  tool_id: string
+  stripe_subscription_id: string | null
+  stripe_customer_id: string | null
+  status: 'active' | 'canceled' | 'past_due'
+  current_period_end: string | null
   created_at: string
 }
 
@@ -117,6 +129,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'live',
     plan_required: 'pro',
     price: 29,
+    stripe_price_id: null,
     image_url: null,
     featured: true,
     sort_order: 1,
@@ -134,6 +147,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'live',
     plan_required: 'agency',
     price: 99,
+    stripe_price_id: 'price_1TRIlmGx0crR4JAj6BkNBt7t',
     image_url: null,
     featured: true,
     sort_order: 2,
@@ -151,6 +165,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'coming_soon',
     plan_required: 'pro',
     price: 75,
+    stripe_price_id: null,
     image_url: null,
     featured: false,
     sort_order: 3,
@@ -168,6 +183,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'coming_soon',
     plan_required: 'pro',
     price: 25,
+    stripe_price_id: null,
     image_url: null,
     featured: false,
     sort_order: 4,
@@ -185,6 +201,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'coming_soon',
     plan_required: 'pro',
     price: 254,
+    stripe_price_id: 'price_1TRIneGx0crR4JAjd8QJfrkj',
     image_url: null,
     featured: false,
     sort_order: 5,
@@ -202,6 +219,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'coming_soon',
     plan_required: 'agency',
     price: 178,
+    stripe_price_id: null,
     image_url: null,
     featured: false,
     sort_order: 6,
@@ -219,6 +237,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'coming_soon',
     plan_required: 'agency',
     price: 49,
+    stripe_price_id: null,
     image_url: null,
     featured: false,
     sort_order: 7,
@@ -236,6 +255,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'coming_soon',
     plan_required: 'pro',
     price: 29,
+    stripe_price_id: null,
     image_url: null,
     featured: false,
     sort_order: 8,
@@ -253,6 +273,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'coming_soon',
     plan_required: 'pro',
     price: 49,
+    stripe_price_id: null,
     image_url: null,
     featured: false,
     sort_order: 9,
@@ -270,6 +291,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'coming_soon',
     plan_required: 'pro',
     price: 19,
+    stripe_price_id: null,
     image_url: null,
     featured: false,
     sort_order: 10,
@@ -287,6 +309,7 @@ export const SAMPLE_PROJECTS: Project[] = [
     status: 'coming_soon',
     plan_required: 'pro',
     price: 15,
+    stripe_price_id: null,
     image_url: null,
     featured: false,
     sort_order: 11,
