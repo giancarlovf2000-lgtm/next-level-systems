@@ -2,11 +2,12 @@
 
 import { Suspense, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import {
   ArrowLeft, Check, Sparkles, Layers, Package, AlertCircle,
   MessageSquare, Target, Globe, Radio, Lock, ChevronRight,
-  Zap, Users, Bot
+  Zap, Users, Bot, Loader2
 } from 'lucide-react'
 import {
   SAMPLE_PROJECTS, SITEFORGE_ID, MERGEABLE_IDS, STANDALONE_ONLY_IDS,
@@ -94,6 +95,9 @@ function CheckoutContent() {
   const router = useRouter()
   const [deliveryMode, setDeliveryMode] = useState<'standalone' | 'merged' | null>(null)
   const [extraPages, setExtraPages] = useState(0)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const supabase = createClient()
 
   const ids = searchParams.get('ids')?.split(',').filter(Boolean) ?? []
   const selected = SAMPLE_PROJECTS.filter((p) => ids.includes(p.id))
@@ -126,10 +130,33 @@ function CheckoutContent() {
   const standaloneOnlySelected = selected.filter((p) => STANDALONE_ONLY_IDS.includes(p.id))
   const canMerge = hasSiteForge && mergeableSelected.length > 0
 
-  const handleProceed = () => {
-    // In a real flow this would create a Stripe checkout session
-    // For now route to /pricing as placeholder
-    router.push('/pricing')
+  const handleProceed = async () => {
+    setCheckoutLoading(true)
+    setCheckoutError(null)
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      router.push(`/auth/login?next=/checkout?ids=${ids.join(',')}`)
+      return
+    }
+
+    const requiresAgency = selected.some((p) => p.plan_required === 'agency')
+    const plan = requiresAgency ? 'agency' : 'pro'
+
+    const res = await fetch('/api/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan, userId: user.id, userEmail: user.email }),
+    })
+
+    const data = await res.json()
+    if (!res.ok || !data.url) {
+      setCheckoutError(data.error || 'Failed to start checkout. Please try again.')
+      setCheckoutLoading(false)
+      return
+    }
+
+    window.location.href = data.url
   }
 
   return (
@@ -217,20 +244,28 @@ function CheckoutContent() {
             {/* Proceed button */}
             <button
               onClick={handleProceed}
-              disabled={deliveryMode === null}
+              disabled={deliveryMode === null || checkoutLoading}
               className={cn(
                 'w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200',
-                deliveryMode !== null
+                deliveryMode !== null && !checkoutLoading
                   ? 'btn-primary text-white shadow-glow-sm hover:shadow-glow-md'
                   : 'bg-surface-2 text-text-muted border border-border cursor-not-allowed'
               )}
             >
               {deliveryMode === null ? (
                 <><Lock className="w-4 h-4" /> Choose a delivery option first</>
+              ) : checkoutLoading ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Redirecting to payment...</>
               ) : (
                 <>Proceed to Payment <ChevronRight className="w-4 h-4" /></>
               )}
             </button>
+            {checkoutError && (
+              <p className="text-xs text-error flex items-center gap-1.5 mt-2">
+                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                {checkoutError}
+              </p>
+            )}
           </div>
 
           {/* ── RIGHT: delivery options ── */}

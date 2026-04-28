@@ -19,6 +19,8 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [resendLoading, setResendLoading] = useState(false)
+  const [resendSent, setResendSent] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -41,9 +43,15 @@ export default function SignupPage() {
     } else {
       setSuccess(true)
       setLoading(false)
-      // Auto-redirect after 3 seconds
-      setTimeout(() => router.push('/dashboard'), 3000)
     }
+  }
+
+  const handleResend = async () => {
+    setResendLoading(true)
+    setResendSent(false)
+    await supabase.auth.resend({ type: 'signup', email })
+    setResendLoading(false)
+    setResendSent(true)
   }
 
   const handleOAuthSignup = async (provider: 'google' | 'github') => {
@@ -66,10 +74,27 @@ export default function SignupPage() {
             <CheckCircle2 className="w-10 h-10 text-success" />
           </div>
           <h2 className="text-3xl font-black text-text-primary mb-3">Account created!</h2>
-          <p className="text-text-secondary mb-2">
-            Welcome to Next Level Systems. Check your email to verify your account.
+          <p className="text-text-secondary mb-6">
+            Welcome to Next Level Systems. Check your email to verify your account before signing in.
           </p>
-          <p className="text-sm text-text-muted">Redirecting to dashboard...</p>
+          {resendSent ? (
+            <p className="text-sm text-success font-medium mb-4">Email resent! Check your inbox.</p>
+          ) : (
+            <button
+              onClick={handleResend}
+              disabled={resendLoading}
+              className="flex items-center justify-center gap-2 mx-auto px-5 py-2.5 rounded-xl bg-surface border border-border text-sm font-medium text-text-secondary hover:text-text-primary hover:border-border-light transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+            >
+              {resendLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              Resend confirmation email
+            </button>
+          )}
+          <button
+            onClick={() => router.push('/auth/login')}
+            className="text-sm text-primary hover:text-primary-light transition-colors font-medium"
+          >
+            Go to login →
+          </button>
         </div>
       </div>
     )

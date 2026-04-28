@@ -158,81 +158,97 @@ export default async function DashboardPage() {
                 </span>
               </div>
 
-              <div className="space-y-3">
-                {SAMPLE_PROJECTS.map((project) => {
-                  const hasAccess =
-                    planCanAccess(userPlan, project.plan_required) &&
-                    project.status !== 'coming_soon'
-                  const isComingSoon = project.status === 'coming_soon'
-
+              {/* Tools user has access to */}
+              <div className="space-y-3 mb-8">
+                {SAMPLE_PROJECTS.filter((p) => planCanAccess(userPlan, p.plan_required)).map((project) => {
+                  const hasAccess = project.status !== 'coming_soon'
                   return (
                     <div
                       key={project.id}
-                      className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 ${
-                        hasAccess
-                          ? 'bg-surface border-border hover:border-primary/40 hover:bg-surface-2'
-                          : 'bg-surface/50 border-border opacity-60'
-                      }`}
+                      className="bg-surface border border-border hover:border-primary/40 hover:bg-surface-2 rounded-xl border transition-all duration-200 p-4"
                     >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold ${
-                            hasAccess
-                              ? 'bg-primary/10 text-primary'
-                              : 'bg-surface-2 text-text-muted'
-                          }`}
-                        >
-                          {project.name.slice(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-text-primary">
-                              {project.name}
-                            </span>
-                            <span
-                              className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                                project.status === 'live'
-                                  ? 'bg-success/10 text-success'
-                                  : project.status === 'beta'
-                                  ? 'bg-warning/10 text-warning'
-                                  : 'bg-surface-2 text-text-muted'
-                              }`}
-                            >
-                              {project.status === 'coming_soon' ? 'Soon' : project.status}
-                            </span>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold bg-primary/10 text-primary flex-shrink-0 mt-0.5">
+                            {project.name.slice(0, 2).toUpperCase()}
                           </div>
-                          <p className="text-xs text-text-muted">{project.description}</p>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-semibold text-text-primary">
+                                {project.name}
+                              </span>
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                                  project.status === 'live'
+                                    ? 'bg-success/10 text-success'
+                                    : project.status === 'beta'
+                                    ? 'bg-warning/10 text-warning'
+                                    : 'bg-surface-2 text-text-muted'
+                                }`}
+                              >
+                                {project.status === 'coming_soon' ? 'Soon' : project.status}
+                              </span>
+                            </div>
+                            <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                              {project.long_description || project.description}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {!hasAccess && !isComingSoon && (
-                          <Link
-                            href="/pricing"
-                            className="text-xs px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-200"
-                          >
-                            Upgrade
-                          </Link>
-                        )}
-                        {isComingSoon && (
-                          <span className="text-xs text-text-muted">Coming Soon</span>
-                        )}
-                        {hasAccess && (
-                          <a
-                            href={project.url || '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-200"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            Open
-                          </a>
-                        )}
+                        <div className="flex-shrink-0">
+                          {hasAccess ? (
+                            <a
+                              href={project.url || '#'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-200"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              Open
+                            </a>
+                          ) : (
+                            <span className="text-xs text-text-muted">Coming Soon</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )
                 })}
               </div>
+
+              {/* Locked tools */}
+              {SAMPLE_PROJECTS.some((p) => !planCanAccess(userPlan, p.plan_required)) && (
+                <>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="text-xs text-text-muted uppercase tracking-widest">Upgrade to unlock</span>
+                    <div className="flex-1 h-px bg-border" />
+                  </div>
+                  <div className="space-y-3 opacity-60">
+                    {SAMPLE_PROJECTS.filter((p) => !planCanAccess(userPlan, p.plan_required)).map((project) => (
+                      <div
+                        key={project.id}
+                        className="flex items-center justify-between p-4 rounded-xl border border-border bg-surface/50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold bg-surface-2 text-text-muted">
+                            {project.name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <span className="text-sm font-semibold text-text-primary">{project.name}</span>
+                            <p className="text-xs text-text-muted">{project.description}</p>
+                          </div>
+                        </div>
+                        <Link
+                          href="/pricing"
+                          className="text-xs px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all duration-200"
+                        >
+                          Upgrade
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
